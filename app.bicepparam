@@ -1,4 +1,4 @@
 using 'app.bicep'
 
 param environment = 'default'
-param replicas = '2'
+param replicas = '1'
