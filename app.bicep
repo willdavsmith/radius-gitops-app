@@ -1,16 +1,20 @@
 // Import the set of Radius resources (Applications.*) into Bicep
 extension radius
 
-@description('The Radius environment to deploy the application to.')
+@description('The Radius environment name to deploy the application and resources to.')
 param environment string
 
-@description('The number of replicas to deploy.')
-param replicas string = '1'
+@description('The number of replicas to deploy for the demo container.')
+param replicas string
+
+resource env 'Applications.Core/environments@2023-10-01-preview' existing = {
+  name: environment
+}
 
 resource app 'Applications.Core/applications@2023-10-01-preview' = {
   name: 'app'
   properties: {
-    environment: environment
+    environment: env.id
   }
 }
 
@@ -27,8 +31,11 @@ resource demo 'Applications.Core/containers@2023-10-01-preview' = {
       }
     }
     connections: {
-      redis: {
-        source: db.id
+      mongodb: {
+        source: mongodb.id
+      }
+      backend: {
+        source: 'http://backend:80'
       }
     }
     extensions: [
@@ -40,10 +47,25 @@ resource demo 'Applications.Core/containers@2023-10-01-preview' = {
   }
 }
 
-resource db 'Applications.Datastores/redisCaches@2023-10-01-preview' = {
-  name: 'db'
+resource mongodb 'Applications.Datastores/mongoDatabases@2023-10-01-preview' = {
+  name: 'mongodb'
+  properties: {
+    environment: env.id
+    application: app.id
+  }
+}
+
+resource backend 'Applications.Core/containers@2023-10-01-preview' = {
+  name: 'backend'
   properties: {
     application: app.id
-    environment: environment
+    container: {
+      image: 'nginx:latest'
+      ports: {
+        api: {
+          containerPort: 80
+        }
+      }
+    }
   }
 }
