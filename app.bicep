@@ -7,10 +7,13 @@ param environment string
 @description('The number of replicas to deploy.')
 param replicas string
 
+// Define the environment ID
+var envId = '/planes/radius/local/resourcegroups/default/providers/Applications.Core/environments/${environment}'
+
 resource app 'Applications.Core/applications@2023-10-01-preview' = {
   name: 'app'
   properties: {
-    environment: environment
+    environment: envId
   }
 }
 
@@ -44,6 +47,6 @@ resource db 'Applications.Datastores/redisCaches@2023-10-01-preview' = {
   name: 'db'
   properties: {
     application: app.id
-    environment: environment
+    environment: envId
   }
 }
