@@ -34,6 +34,9 @@ resource demo 'Applications.Core/containers@2023-10-01-preview' = {
       redis: {
         source: db.id
       }
+      backend: {
+        source: 'http://backend:80'
+      }
     }
     extensions: [
       {
@@ -52,3 +55,17 @@ resource db 'Applications.Datastores/redisCaches@2023-10-01-preview' = {
   }
 }
 
+resource backend 'Applications.Core/containers@2023-10-01-preview' = {
+  name: 'backend'
+  properties: {
+    application: app.id
+    container: {
+      image: 'nginx:latest'
+      ports: {
+        api: {
+          containerPort: 80
+        }
+      }
+    }
+  }
+}
