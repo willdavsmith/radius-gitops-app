@@ -31,8 +31,8 @@ resource demo 'Applications.Core/containers@2023-10-01-preview' = {
       }
     }
     connections: {
-      mongodb: {
-        source: mongodb.id
+      redis: {
+        source: db.id
       }
       backend: {
         source: 'http://backend:80'
@@ -47,11 +47,11 @@ resource demo 'Applications.Core/containers@2023-10-01-preview' = {
   }
 }
 
-resource mongodb 'Applications.Datastores/mongoDatabases@2023-10-01-preview' = {
-  name: 'mongodb'
+resource db 'Applications.Datastores/redisCaches@2023-10-01-preview' = {
+  name: 'db'
   properties: {
-    environment: env.id
     application: app.id
+    environment: env.id
   }
 }
 
